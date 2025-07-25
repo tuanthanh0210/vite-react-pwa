@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import './App.css'
+import { ErrorBoundary } from './components/ErrorBoundary'
+import { LoadingSpinner } from './components/LoadingSpinner'
 
 interface Product {
   id: number
@@ -39,6 +41,27 @@ function App() {
     window.addEventListener('popstate', handlePopState)
     return () => window.removeEventListener('popstate', handlePopState)
   }, [])
+
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedCart = localStorage.getItem('pwa-store-cart')
+      if (savedCart) {
+        setCart(JSON.parse(savedCart))
+      }
+    } catch (error) {
+      console.error('Error loading cart from localStorage:', error)
+    }
+  }, [])
+
+  // Save cart to localStorage whenever cart changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('pwa-store-cart', JSON.stringify(cart))
+    } catch (error) {
+      console.error('Error saving cart to localStorage:', error)
+    }
+  }, [cart])
   
   // Navigation function
   const navigateTo = (path: string) => {
@@ -325,138 +348,142 @@ function App() {
   }
 
   return (
-    <div className="app">
-      {/* Toast Container */}
-      <div className="toast-container">
-        {toasts.map(toast => (
-          <div 
-            key={toast.id} 
-            className={`toast toast-${toast.type}`}
-            onClick={() => removeToast(toast.id)}
-          >
-            <div className="toast-content">
-              <span className="toast-icon">
-                {toast.type === 'success' && '✅'}
-                {toast.type === 'error' && '❌'}
-                {toast.type === 'info' && 'ℹ️'}
-              </span>
-              <span className="toast-message">{toast.message}</span>
-            </div>
-            <button 
-              className="toast-close"
-              onClick={(e) => {
-                e.stopPropagation()
-                removeToast(toast.id)
-              }}
-            >
-              ×
-            </button>
+    <ErrorBoundary>
+      <Suspense fallback={<LoadingSpinner message="Đang tải ứng dụng..." />}>
+        <div className="app">
+          {/* Toast Container */}
+          <div className="toast-container">
+            {toasts.map(toast => (
+              <div 
+                key={toast.id} 
+                className={`toast toast-${toast.type}`}
+                onClick={() => removeToast(toast.id)}
+              >
+                <div className="toast-content">
+                  <span className="toast-icon">
+                    {toast.type === 'success' && '✅'}
+                    {toast.type === 'error' && '❌'}
+                    {toast.type === 'info' && 'ℹ️'}
+                  </span>
+                  <span className="toast-message">{toast.message}</span>
+                </div>
+                <button 
+                  className="toast-close"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    removeToast(toast.id)
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {/* Desktop Navbar */}
-      <nav className="desktop-navbar">
-        <div className="navbar-content">
-          <div className="logo">
+          {/* Desktop Navbar */}
+          <nav className="desktop-navbar">
+            <div className="navbar-content">
+              <div className="logo">
+                <h1 onClick={() => navigateTo('/')} style={{ cursor: 'pointer' }}>
+                  PWA Store
+                </h1>
+              </div>
+              <div className="nav-links">
+                <button 
+                  className={isActive('/') ? 'active' : ''} 
+                  onClick={() => navigateTo('/')}
+                >
+                  🏠 Trang chủ
+                </button>
+                <button 
+                  className={isActive('/search') ? 'active' : ''} 
+                  onClick={() => navigateTo('/search')}
+                >
+                  🔍 Tìm kiếm
+                </button>
+                <button 
+                  className={isActive('/favorites') ? 'active' : ''} 
+                  onClick={() => navigateTo('/favorites')}
+                >
+                  ❤️ Yêu thích
+                </button>
+                <button 
+                  className={isActive('/cart') ? 'active' : ''} 
+                  onClick={() => navigateTo('/cart')}
+                >
+                  🛒 Giỏ hàng
+                  {getCartItemCount() > 0 && (
+                    <span className="cart-badge">{getCartItemCount()}</span>
+                  )}
+                </button>
+                <button 
+                  className={isActive('/profile') ? 'active' : ''} 
+                  onClick={() => navigateTo('/profile')}
+                >
+                  👤 Hồ sơ
+                </button>
+              </div>
+            </div>
+          </nav>
+
+          {/* Mobile Header */}
+          <header className="mobile-header">
             <h1 onClick={() => navigateTo('/')} style={{ cursor: 'pointer' }}>
               PWA Store
             </h1>
-          </div>
-          <div className="nav-links">
+          </header>
+
+          {/* Main Content */}
+          <main className="main-content">
+            {renderContent()}
+          </main>
+
+          {/* Mobile Bottom Navigation */}
+          <nav className="bottom-nav">
             <button 
               className={isActive('/') ? 'active' : ''} 
               onClick={() => navigateTo('/')}
             >
-              🏠 Trang chủ
+              <span className="icon">🏠</span>
+              <span className="label">Trang chủ</span>
             </button>
             <button 
               className={isActive('/search') ? 'active' : ''} 
               onClick={() => navigateTo('/search')}
             >
-              🔍 Tìm kiếm
+              <span className="icon">🔍</span>
+              <span className="label">Tìm kiếm</span>
             </button>
             <button 
               className={isActive('/favorites') ? 'active' : ''} 
               onClick={() => navigateTo('/favorites')}
             >
-              ❤️ Yêu thích
+              <span className="icon">❤️</span>
+              <span className="label">Yêu thích</span>
             </button>
             <button 
               className={isActive('/cart') ? 'active' : ''} 
               onClick={() => navigateTo('/cart')}
             >
-              🛒 Giỏ hàng
-              {getCartItemCount() > 0 && (
-                <span className="cart-badge">{getCartItemCount()}</span>
-              )}
+              <span className="icon">
+                🛒
+                {getCartItemCount() > 0 && (
+                  <span className="cart-badge">{getCartItemCount()}</span>
+                )}
+              </span>
+              <span className="label">Giỏ hàng</span>
             </button>
             <button 
               className={isActive('/profile') ? 'active' : ''} 
               onClick={() => navigateTo('/profile')}
             >
-              👤 Hồ sơ
+              <span className="icon">👤</span>
+              <span className="label">Hồ sơ</span>
             </button>
-          </div>
+          </nav>
         </div>
-      </nav>
-
-      {/* Mobile Header */}
-      <header className="mobile-header">
-        <h1 onClick={() => navigateTo('/')} style={{ cursor: 'pointer' }}>
-          PWA Store
-        </h1>
-      </header>
-
-      {/* Main Content */}
-      <main className="main-content">
-        {renderContent()}
-      </main>
-
-      {/* Mobile Bottom Navigation */}
-      <nav className="bottom-nav">
-        <button 
-          className={isActive('/') ? 'active' : ''} 
-          onClick={() => navigateTo('/')}
-        >
-          <span className="icon">🏠</span>
-          <span className="label">Trang chủ</span>
-        </button>
-        <button 
-          className={isActive('/search') ? 'active' : ''} 
-          onClick={() => navigateTo('/search')}
-        >
-          <span className="icon">🔍</span>
-          <span className="label">Tìm kiếm</span>
-        </button>
-        <button 
-          className={isActive('/favorites') ? 'active' : ''} 
-          onClick={() => navigateTo('/favorites')}
-        >
-          <span className="icon">❤️</span>
-          <span className="label">Yêu thích</span>
-        </button>
-        <button 
-          className={isActive('/cart') ? 'active' : ''} 
-          onClick={() => navigateTo('/cart')}
-        >
-          <span className="icon">
-            🛒
-            {getCartItemCount() > 0 && (
-              <span className="cart-badge">{getCartItemCount()}</span>
-            )}
-          </span>
-          <span className="label">Giỏ hàng</span>
-        </button>
-        <button 
-          className={isActive('/profile') ? 'active' : ''} 
-          onClick={() => navigateTo('/profile')}
-        >
-          <span className="icon">👤</span>
-          <span className="label">Hồ sơ</span>
-        </button>
-      </nav>
-    </div>
+      </Suspense>
+    </ErrorBoundary>
   )
 }
 

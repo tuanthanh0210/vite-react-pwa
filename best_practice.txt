@@ -1,0 +1,96 @@
+🧠 1. Cấu hình manifest đầy đủ
+	•	Lý do: manifest.json là “danh tính” của app khi được cài trên điện thoại. Nó giúp trình duyệt hiểu cách hiển thị icon, màu chủ đạo, tên ứng dụng, hướng khởi động, v.v.
+	•	Ứng dụng: Giúp app hoạt động như native app khi “Add to Home Screen”, hiển thị tên và icon đẹp mắt, nhất quán.
+
+1. ✅ Configure a complete manifest.json
+	•	Why it matters: The manifest defines how your app appears when installed—its name, icons, theme color, start behavior, and display mode.
+	•	Real-world impact: Ensures your app looks and behaves like a native app when added to the home screen, including proper icons and names.
+⸻
+
+⚙️ 2. Sử dụng vite-plugin-pwa và Service Worker
+	•	Lý do: Tự động tạo service worker, xử lý cache, offline, và update. Nếu không có SW, app không hoạt động offline.
+	•	Ứng dụng: Hỗ trợ truy cập app ngay cả khi mất mạng, tăng tốc load lần 2 trở đi, cải thiện trải nghiệm người dùng đáng kể.
+
+2. ⚙️ Use vite-plugin-pwa and enable Service Worker
+	•	Why it matters: This plugin simplifies service worker generation, handles caching strategies, and enables offline support.
+	•	Real-world impact: Users can load your app even without internet connectivity, improving speed and reliability after the first visit.
+⸻
+
+💾 3. Caching hợp lý
+	•	Lý do: Nếu bạn cache sai — ví dụ cache dữ liệu API động — có thể khiến người dùng thấy dữ liệu cũ không được cập nhật.
+	•	Ứng dụng: Chỉ cache các file tĩnh giúp tiết kiệm băng thông và giảm thời gian tải, đồng thời vẫn đảm bảo dữ liệu người dùng luôn mới.
+
+3. 💾 Optimize caching strategy
+	•	Why it matters: Caching everything blindly can lead to stale data or storage issues. Only cache static assets and essential resources.
+	•	Real-world impact: Reduces bandwidth and speeds up the app, while still keeping user data fresh and up to date.
+
+⸻
+
+📴 4. Offline fallback UI
+	•	Lý do: Khi người dùng offline mà bạn không xử lý fallback, app có thể trắng xóa hoặc báo lỗi khó hiểu.
+	•	Ứng dụng: Giúp người dùng biết là họ đang mất mạng và app vẫn hoạt động 1 phần, tạo cảm giác “reliable” giống native app.
+
+4. 📴 Provide offline fallback UI
+	•	Why it matters: Users may lose connection. If no fallback UI exists, the app might crash or show blank screens.
+	•	Real-world impact: Displays meaningful messages or interfaces when offline, increasing user trust and usability.
+
+⸻
+
+🧩 5. Lazy load và code splitting
+	•	Lý do: Load toàn bộ ứng dụng ngay từ đầu sẽ làm tăng thời gian tải và ảnh hưởng SEO, đặc biệt với app nhiều trang.
+	•	Ứng dụng: Tối ưu hiệu năng — chỉ tải những gì cần dùng, tăng tốc tải trang đầu tiên, tiết kiệm data cho người dùng mobile.
+
+5. 🔀 Implement code splitting & lazy loading
+	•	Why it matters: Loading all components upfront increases initial load time and may overwhelm mobile devices.
+	•	Real-world impact: Improves performance and responsiveness by loading only what’s needed for each page or route.
+
+⸻
+
+📱 6. Mobile-first & responsive
+	•	Lý do: Đa số người dùng PWA là từ mobile. App không responsive sẽ gây lỗi giao diện, khó thao tác.
+	•	Ứng dụng: Tạo trải nghiệm thân thiện và trơn tru trên mọi thiết bị, đặc biệt là điện thoại.
+
+6. 📱 Design mobile-first & responsive UIs
+	•	Why it matters: Most users accessing PWAs are on mobile devices. A fixed layout breaks usability across screens.
+	•	Real-world impact: Ensures the app looks great and functions well across all screen sizes and devices.
+
+⸻
+
+🔁 7. Tự động cập nhật bản mới
+	•	Lý do: Nếu không có cơ chế update, người dùng sẽ bị “mắc kẹt” ở bản cũ mãi mãi vì SW vẫn cache file cũ.
+	•	Ứng dụng: Khi bạn deploy bản mới, người dùng nhận được bản cập nhật liền mà không cần xoá cache thủ công.
+
+7. 🔄 Enable auto-update logic for Service Worker
+	•	Why it matters: Without update handling, users may stay stuck on outdated versions even after deployment.
+	•	Real-world impact: Users automatically get the latest app version, improving consistency and reducing support issues.
+
+
+⸻
+
+🧪 8. Kiểm tra bằng Lighthouse
+	•	Lý do: Lighthouse giúp bạn phát hiện các lỗi không rõ ràng như performance thấp, accessibility kém, PWA chưa đúng chuẩn.
+	•	Ứng dụng: Đảm bảo app đạt chuẩn chất lượng cao, có thể xuất hiện trên Chrome Web Store hoặc Android Home Screen đúng cách.
+
+8. 🧪 Run Lighthouse audits regularly
+	•	Why it matters: Google Lighthouse checks PWA compatibility, accessibility, SEO, and performance.
+	•	Real-world impact: Helps ensure your app meets high-quality standards and qualifies as a “Installable PWA.”
+
+⸻
+
+🔐 9. HTTPS & bảo mật
+	•	Lý do: PWA chỉ hoạt động trên HTTPS (hoặc localhost). Ngoài ra, HTTPS bảo vệ người dùng khỏi các tấn công MITM.
+	•	Ứng dụng: App của bạn sẽ được trình duyệt tin tưởng và cấp quyền sử dụng các tính năng đặc biệt như push notification, geolocation.
+
+9. 🔐 Always use HTTPS
+	•	Why it matters: PWAs only work over secure connections. HTTPS also protects against man-in-the-middle attacks.
+	•	Real-world impact: Enables full PWA features like geolocation, push notifications, and service workers.
+
+⸻
+
+🔔 10. Push & Background Sync
+	•	Lý do: Giúp tăng sự tương tác, giữ chân người dùng, và đảm bảo dữ liệu được gửi ngay cả khi offline.
+	•	Ứng dụng: Cho phép người dùng gửi comment, form… khi offline, và tự động sync lại khi có mạng. Ngoài ra, push giúp thông báo cập nhật mới.
+
+10. 🔔 Consider push notifications & background sync
+	•	Why it matters: These features increase user engagement and enable offline-first interactions like queued actions.
+	•	Real-world impact: Users can receive updates or submit actions offline that automatically sync when back online.
